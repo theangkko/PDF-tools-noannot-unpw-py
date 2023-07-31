@@ -164,7 +164,7 @@ class PDFunpwnoannot(ttk.Frame):
         """Print the contents to console and return the values."""
         print("folder name:", self.path_var.get())
         print("file name:", self.filename_path_var.get())
-        filename = self.filename_path_var.get()
+        filename = pathlib.Path(self.filename_path_var.get())
         print("unpw/noannot :", self.option_method_unpw.get(), self.option_method_noannot.get())
         if self.option_method_noannot.get() == 100:
             Thread(target=self.remove_annotation_from_pdf,
@@ -184,7 +184,9 @@ class PDFunpwnoannot(ttk.Frame):
         # with pikepdf.open(filename) as pdf:
         #     pdf.save(f"{filename}_unpw.pdf")
         pdf = pikepdf.open(filename)
-        pdf.save(f"{filename}_unpw.pdf")
+        # pdf.save(f"{filename}_unpw.pdf")
+        pdf.save(f"{filename.parent}/{filename.stem}_unpw{filename.suffix}")
+        
         
     def remove_annotation_from_pdf(self, filename, password=None):
         with pikepdf.open(filename) as pdf:
@@ -192,12 +194,14 @@ class PDFunpwnoannot(ttk.Frame):
                 print(page.Annots)
                 if page.Annots:
                     page.Annots = []
-            pdf.save(f"{filename}_noAnnot.pdf")
+            # pdf.save(f"{filename}_noAnnot.pdf")
+            pdf.save(f"{filename.parent}/{filename.stem}_noAnnot{filename.suffix}")
+            
 
 
 
 if __name__ == "__main__":
-    app = ttk.Window("PDF Tools-noAnnot_unpw v0.9.0", "flatly", resizable=(False, False))
+    app = ttk.Window("PDF Tools-noAnnot_unpw v0.9.2", "flatly", resizable=(False, False))
     app.geometry("600x400")
     PDFunpwnoannot(app)
     app.mainloop()
