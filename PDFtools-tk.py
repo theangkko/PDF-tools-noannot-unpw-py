@@ -1,6 +1,9 @@
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
+from tkinterdnd2 import DND_FILES, TkinterDnD
+# import tkinter as tk
+
 
 from tkinter.filedialog import askdirectory
 from tkinter.filedialog import askopenfilename
@@ -21,7 +24,8 @@ class PDFunpwnoannot(ttk.Frame):
         self.name = ttk.StringVar(value="")
 
         self.path_var = ttk.StringVar(value="")
-        self.filename_path_var = ttk.StringVar(value="")
+        self.filename_path_var = ttk.StringVar(value="Drop file HERE")
+        self.work_result_var = ttk.StringVar(value="...")
 
         # application variables
         _path = pathlib.Path().absolute().as_posix()
@@ -40,6 +44,7 @@ class PDFunpwnoannot(ttk.Frame):
         # form entries
         self.create_form_entry("File Path", self.filename_path_var)
         self.create_buttonbox()
+        # self.create_result_message()
 
          # two finger gestures
         option_PDF_method = ttk.Labelframe(
@@ -69,7 +74,7 @@ class PDFunpwnoannot(ttk.Frame):
         op_unpw = ttk.Checkbutton(
             master=option_PDF_method,
             bootstyle="success-round-toggle",
-            text='Remove PDF password',
+            text='Unprotect PDF for edit',
             variable=self.option_method_unpw,
             onvalue=10,
             offvalue=0,
@@ -97,7 +102,28 @@ class PDFunpwnoannot(ttk.Frame):
 
         ent = ttk.Entry(master=container, textvariable=variable)
         ent.pack(side=LEFT, padx=5, fill=X, expand=YES)
+        ent.drop_target_register(DND_FILES)
+        ent.dnd_bind('<<Drop>>', self.drop_inside_box_find_filepath )
+    
+    
+    def create_result_message(self):
+        container2 = ttk.Frame(self)
+        container2.pack(fill=X, expand=YES, pady=5)
+        container2.children.clear()
+        lbl_result = ttk.Label(master=container2, text=self.work_result_var.get())
+        lbl_result.pack(side=LEFT, padx=5)
+        
+        
 
+    def drop_inside_box_find_filepath(self, event):
+        print(type(event.data), event.data)
+        filepaths = event.data.split(' ')
+        for each in filepaths:
+            if each.split('/')[-1].endswith(".pdf"):
+                print(each)
+                self.filename_path_var.set(each)    
+
+    
     def create_buttonbox(self):
         """Create the application buttonbox"""
         container = ttk.Frame(self)
@@ -174,6 +200,11 @@ class PDFunpwnoannot(ttk.Frame):
             Thread(target=self.remove_password_from_pdf, 
                    args=[filename] 
                    ).start()
+        result_message = str(filename) + " DONE"
+        print(result_message)
+        self.work_result_var.set(result_message)
+        self.create_result_message()
+
 
     def on_cancel(self):
         """Cancel and close the application."""
@@ -201,7 +232,11 @@ class PDFunpwnoannot(ttk.Frame):
 
 
 if __name__ == "__main__":
-    app = ttk.Window("PDF Tools-noAnnot_unpw v0.9.2", "flatly", resizable=(False, False))
-    app.geometry("600x400")
+    app = TkinterDnD.Tk()
+    # app.iconphoto(False, tk.PhotoImage(file="icon.ico"))
+    # app.iconbitmap(pathlib.Path("icon.ico"))
+    app.title("PDF Tools-noAnnot_unpw v0.9.4")
+    # app = ttk.Window("PDF Tools-noAnnot_unpw v0.9.4", "flatly", resizable=(False, False))
+    app.geometry("500x350")
     PDFunpwnoannot(app)
     app.mainloop()
