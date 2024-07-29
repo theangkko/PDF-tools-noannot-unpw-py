@@ -5,12 +5,14 @@ description = "PDF delete all annotation or unlock for editing"
 authors = ["theangkko <theangkko@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pikepdf = "^8.6.0"
+pikepdf = "^9.1.0"
 ttkbootstrap = "^1.10.1"
 tkinterdnd2 = "^0.3.0"
+
 
 
 [build-system]
